@@ -1,0 +1,31 @@
+body {
+  background-color: rgb(59, 177, 137);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 20px;
+  text-align: center;
+}
+h1 {
+  color: rgb(212, 1, 131);
+}
+input {
+  width: 150px;
+  height: 20px;
+}
+.TheDiv {
+  border: 4px;
+  border-style: dotted;
+  border-color: rgb(212, 1, 131);
+  width: 250px;
+  height: 200px;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  margin-right: 100px;
+  margin-left: 80px;
+  float: left;
+}
+.btn {
+  height: 30px;
+  background-color: rgb(212, 1, 131);
+  border-radius: 25px;
+  border-color: rgb(59, 177, 137);
+}

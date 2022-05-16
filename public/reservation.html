@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="reservation.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Reservations</h1>
+    <input data-role="room_id" type="text" placeholder="room_id" />
+
+    <input
+      data-role="capacity"
+      type="number"
+      placeholder="capacity"
+    /><br /><br />
+
+    <input
+      data-role="theId"
+      type="text"
+      placeholder="the Id"
+    /><br /><br /><br />
+    <input
+      class="btn"
+      data-role="addReservation"
+      type="button"
+      value="add Reservation"
+    />
+    <input
+      class="btn"
+      data-role="getReservations"
+      type="button"
+      value="get all Reservations"
+    />
+
+    <input
+      class="btn"
+      data-role="getReservation"
+      type="button"
+      value="get reservation"
+    />
+    <input
+      class="btn"
+      data-role="updateReservation"
+      type="button"
+      value="update Reservation"
+    />
+    <input
+      class="btn"
+      data-role="deleteReservation"
+      type="button"
+      value="delete Reservation"
+    />
+    <input
+      class="btn"
+      data-role="overThreeGuests"
+      type="button"
+      value="oveer Three Guests"
+    />
+
+    <div class="TheDiv" data-role="Reservations">The Reservations</div>
+    <div class="TheDiv" data-role="Reservation">the Reservation By Id</div>
+    <div class="TheDiv" data-role="overThree">The room over three guests</div>
+    <script>
+      $(function () {
+        $('[data-role="addReservation"]').click(function () {
+          console.log("klkl");
+          const room_id = $('[data-role="room_id"]').val();
+          const capacity = $('[data-role="capacity"]').val();
+          $.post("/reservation", { room_id, capacity }, (resolve) => {
+            console.log(resolve);
+          });
+        });
+
+        $('[data-role="getReservations"]').click(function () {
+          $.get("/reservation", (resolve) => {
+            const thereservation = $('[data-role="Reservations"]');
+            thereservation.html("");
+            $.each(resolve, (_, reserv) => {
+              const divReserv = $(`<div data-role=${reserv._id}>`);
+              $.each(reserv, (_, res) => {
+                divReserv.append(`<span>${res}</span><br>`);
+              });
+              thereservation.append(divReserv);
+            });
+          });
+        });
+
+        $('[data-role="getReservation"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          $.get("/reservation/" + theid, (resolve) => {
+            const reservId = $('[data-role="Reservation"]');
+            reservId.html("");
+            $.each(resolve, (_, reserv) => {
+              const divReserv = $(`<div data-role=${reserv}>`);
+              divReserv.append(`<span>${reserv}</span><br>`);
+              reservId.append(divReserv);
+            });
+          });
+        });
+
+        $('[data-role="updateReservation"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          const room_id = $('[data-role="room_id"]').val();
+          const capacity = $('[data-role="capacity"]').val();
+          fetch("/reservation/" + theid, {
+            method: "put",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ room_id, capacity }),
+          });
+        });
+
+        $('[data-role="deleteReservation"]').click(function () {
+          const theId = $('[data-role="theId"]').val();
+          fetch("/reservation" + theId, {
+            method: "DELETE",
+            headers: {
+              contentType: "application/json",
+            },
+          })
+            .then((res) => res.json()) // or res.json()
+            .then((res) => console.log(res));
+        });
+
+        $('[data-role="overThreeGuests"]').click(function () {
+          $.get("/reservation/overThree/true", (resolve) => {
+            const theOverThree = $('[data-role="overThree"]');
+            theOverThree.html("");
+            $.each(resolve, (_, over) => {
+              const divReserv = $(`<div data-role=${over}>`);
+              //         $.each(over, (_, res)=>{
+              divReserv.append(
+                `<span>${over.room_id} = ${over.capacity}</span><br>`
+              );
+
+              //         })
+              theOverThree.append(divReserv);
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

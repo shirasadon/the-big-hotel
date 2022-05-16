@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="guests.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <link rel="stylesheet" href="reservation.html">
+    <link rel="stylesheet" href="guests.html">
+    <link rel="stylesheet" href="rooms.html">
+    <h1>Guests</h1>
+    <input data-role="name" type="text" placeholder="name" />
+    <input data-role="gender" type="text" placeholder="gender" />
+    <input data-role="dateOfBirth" type="date" placeholder="dateOfBirth" />
+    <label for="">isVip</label>
+    <input data-role="isVip" type="checkbox" /><br /><br />
+    <input data-role="theId" type="text" placeholder="the Id" /><br /><br />
+    <input class="btn" data-role="addguests" type="button" value="add guests" />
+    <input
+      class="btn"
+      data-role="getAllGuests"
+      type="button"
+      value="get all guests"
+    />
+    <input class="btn" data-role="getGuest" type="button" value="get guest" />
+    <input
+      class="btn"
+      data-role="updateGuest"
+      type="button"
+      value="update guest"
+    />
+    <input
+      class="btn"
+      data-role="deleteGuest"
+      type="button"
+      value="delete guest"
+    />
+    <div class="TheDiv" data-role="guests">The Guests</div>
+    <div class="TheDiv" data-role="guest">the Guest By Id</div>
+
+    <script>
+      $(function () {
+        $('[data-role="addguests"]').click(function () {
+          const name = $('[data-role="name"]').val();
+          const gender = $('[data-role="gender"]').val();
+          const dateOfBirth = $('[data-role="dateOfBirth"]').val();
+          const isVip = checkIfTrue($('[data-role="isVip"]'));
+          $.post("/guests", { name, gender, dateOfBirth, isVip }, (resolve) => {
+            console.log(resolve);
+          });
+        });
+
+        const checkIfTrue = (isTrue) => {
+          return $(isTrue).is(":checked");
+        };
+
+        $('[data-role="getAllGuests"]').click(function () {
+          $.get("/guests", (resolve) => {
+            const theagauests = $('[data-role="guests"]');
+            theagauests.html("");
+            $.each(resolve, (_, guest) => {
+              const divRoom = $(`<div data-role=${guest._id}>`);
+              divRoom.append(`<span>name:${guest.name}</span><br>`);
+              theagauests.append(divRoom);
+            });
+          });
+        });
+
+        $('[data-role="getGuest"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          $.get("/guests/" + theid, (resolve) => {
+            const guestId = $('[data-role="guest"]');
+            guestId.html("");
+            $.each(resolve, (_, guest) => {
+              const divRoom = $(`<div ${guest} >`);
+              // $.each(guest, (_, propGuest)=>{
+              divRoom.append(`<span> ${guest}</span><br>`);
+              guestId.append(divRoom);
+              // })
+            });
+          });
+        });
+        $('[data-role="updateGuest"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          const name = $('[data-role="name"]').val();
+          const gender = $('[data-role="gender"]').val();
+          const dateOfBirth = $('[data-role="dateOfBirth"]').val();
+          const isVip = checkIfTrue($('[data-role="isVip"]'));
+          fetch("/guests/" + theid, {
+            method: "put",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ name, gender, dateOfBirth, isVip }),
+          });
+        });
+        $('[data-role="deleteGuest"]').click(function () {
+          const theId = $('[data-role="theId"]').val();
+          fetch("/guests" + theId, {
+            method: "DELETE",
+            headers: {
+              contentType: "application/json",
+            }
+              .then((res) => res.json()) // or res.json()
+              .then((res) => console.log(res)),
+          });
+        });
+
+        $.get("/guests/canDrink", (resolve) => {
+          console.log(resolve);
+        });
+      });
+    </script>
+  </body>
+</html>

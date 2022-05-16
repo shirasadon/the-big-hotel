@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="rooms.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Rooms</h1>
+    <label for="is vip">is vip</label>
+    <input data-role="isVip" type="checkbox" placeholder="isVip" />
+    <label for="have bath">have bath</label>
+    <input data-role="haveBath" type="checkbox" placeholder="haveBath" />
+    <input
+      data-role="roomNumber"
+      type="number"
+      placeholder="roomNumber"
+    /><br /><br />
+    <br />
+    <input
+      data-role="theId"
+      type="text"
+      placeholder="the Id"
+    /><br /><br /><br />
+    <input class="btn" data-role="addRoom" type="button" value="add Room" />
+    <input
+      class="btn"
+      data-role="getAllRooms"
+      type="button"
+      value="get all rooms"
+    />
+    <input class="btn" data-role="getRoom" type="button" value="get Room" />
+    <input
+      class="btn"
+      data-role="updateRoom"
+      type="button"
+      value="update room"
+    />
+    <input
+      class="btn"
+      data-role="deleteRoom"
+      type="button"
+      value="delete room"
+    />
+    <input
+      class="btn"
+      data-role="haveBathVipBtn"
+      type="button"
+      value="have Bath or vip"
+    />
+
+    <input class="btn" data-role="haveBathBtn" type="button" value="haveBath" />
+    <div class="TheDiv" data-role="haveBath">the rooms have bath</div>
+    <div class="TheDiv" data-role="batheorvip">
+      the rooms have bath or is vip
+    </div>
+
+    <div class="TheDiv" data-role="Rooms">The Rooms</div>
+    <div class="TheDiv" data-role="Room">the Room By Id</div>
+    <script>
+      $(function () {
+        $('[data-role="addRoom"]').click(function () {
+          const isVip = checkIfTrue($('[data-role="isVip"]'));
+          const haveBath = checkIfTrue($('[data-role="haveBath"]'));
+          const roomNumber = $('[data-role="roomNumber"]').val();
+          $.post("/rooms", { isVip, haveBath, roomNumber }, (resolve) => {
+            console.log(resolve);
+          });
+        });
+
+        const checkIfTrue = (isTrue) => {
+          return $(isTrue).is(":checked");
+        };
+
+        $('[data-role="getAllRooms"]').click(function () {
+          $.get("/rooms", (resolve) => {
+            const therooms = $('[data-role="Rooms"]');
+            therooms.html("");
+            $.each(resolve, (_, room) => {
+              const divRoom = $(
+                `<div data-role=${room._id}>The room number:</div>`
+              );
+              divRoom.append(`<span> ${room.roomNumber}</span><br>`);
+              therooms.append(divRoom);
+            });
+          });
+        });
+
+        $('[data-role="getRoom"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          $.get("/rooms/" + theid, (resolve) => {
+            const roomId = $('[data-role="Room"]');
+            roomId.html("");
+            $.each(resolve, (_, room) => {
+              const divRoom = $(`<div data-role=${room._id}>`);
+              divRoom.append(`<span> Room details:${room}</span><br>`);
+              roomId.append(divRoom);
+            });
+          });
+        });
+
+        $('[data-role="updateRoom"]').click(function () {
+          const theid = $('[data-role="theId"]').val();
+          const isVip = checkIfTrue($('[data-role="isVip"]'));
+          const haveBath = checkIfTrue($('[data-role="haveBath"]'));
+          const roomNumber = $('[data-role="roomNumber"]').val();
+          fetch("/rooms/" + theid, {
+            method: "put",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ isVip, haveBath, roomNumber }),
+          });
+        });
+        $('[data-role="deleteRoom"]')
+          .click(function () {
+            const theId = $('[data-role="theId"]').val();
+            fetch("/rooms/" + theId, {
+              method: "DELETE",
+              headers: {
+                contentType: "application/json",
+              },
+            });
+          })
+          .then((res) => res.json()) // or res.json()
+          .then((res) => console.log(res));
+      });
+
+      $('[data-role="haveBathBtn"]').click(function () {
+        $.get("/rooms/roomsHaveBath/true", (resolve) => {
+          const haveBathroom = $('[data-role="haveBath"]');
+          haveBathroom.html(" ");
+          $.each(resolve, (_, bath) => {
+            const divRoom = $(`<div data-role=${bath._id}>`);
+            divRoom.append(
+              `<span> Rooms with bath: ${bath.roomNumber}</span><br>`
+            );
+            haveBathroom.append(divRoom);
+          });
+        });
+      });
+
+      $('[data-role="haveBathVipBtn"]').click(function () {
+        $.get("/rooms/batheorvip/true", (resolve) => {
+          const haveBathVip = $('[ data-role="batheorvip"]');
+          haveBathVip.html(" ");
+          $.each(resolve, (_, bathVip) => {
+            const divRoom = $(`<div data-role=${bathVip._id}>`);
+            divRoom.append(
+              `<span> Rooms with bath or vip: ${bathVip.roomNumber}</span><br>`
+            );
+            haveBathVip.append(divRoom);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
